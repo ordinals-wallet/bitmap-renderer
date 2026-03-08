@@ -1,9 +1,9 @@
-use image::{ImageBuffer, Rgb, ImageEncoder, codecs::png::PngEncoder};
+use image::{ImageBuffer, Rgba, ImageEncoder, codecs::png::PngEncoder};
 use serde::Deserialize;
 
 const IMAGE_SIZE: f64 = 576.0;
-const BITCOIN_ORANGE: Rgb<u8> = Rgb([247, 147, 26]);
-const BACKGROUND: Rgb<u8> = Rgb([255, 255, 255]);
+const BITCOIN_ORANGE: Rgba<u8> = Rgba([247, 147, 26, 255]);
+const BACKGROUND: Rgba<u8> = Rgba([0, 0, 0, 0]);
 
 #[derive(Deserialize)]
 pub struct Block {
@@ -261,7 +261,7 @@ pub fn render_bitmap(block: &Block) -> Vec<u8> {
     let offset_y = (IMAGE_SIZE - rendered_h) / 2.0;
 
     let img_size = IMAGE_SIZE as u32;
-    let mut img: ImageBuffer<Rgb<u8>, Vec<u8>> =
+    let mut img: ImageBuffer<Rgba<u8>, Vec<u8>> =
         ImageBuffer::from_pixel(img_size, img_size, BACKGROUND);
 
     for sq in &squares {
@@ -285,7 +285,7 @@ pub fn render_bitmap(block: &Block) -> Vec<u8> {
 
     let mut buf = Vec::new();
     PngEncoder::new(&mut buf)
-        .write_image(img.as_raw(), img_size, img_size, image::ExtendedColorType::Rgb8)
+        .write_image(img.as_raw(), img_size, img_size, image::ExtendedColorType::Rgba8)
         .unwrap();
     buf
 }
