@@ -128,6 +128,7 @@ async fn main() {
 
     let app = Router::new()
         .route("/{filename}", axum::routing::get(handle_bitmap))
+        .layer(tower_http::trace::TraceLayer::new_for_http())
         .with_state(state);
 
     let addr = std::net::SocketAddr::from(([0, 0, 0, 0], port));
