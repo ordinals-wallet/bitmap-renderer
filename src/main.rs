@@ -52,7 +52,7 @@ async fn get_block(state: &AppState, height: u64) -> Result<Block, String> {
         "params": [hash, 2]
     });
 
-    let block_resp: BlockResponse = state
+    let block_bytes = state
         .client
         .post(&state.rpc_url)
         .basic_auth(&state.rpc_user, Some(&state.rpc_pass))
@@ -60,8 +60,11 @@ async fn get_block(state: &AppState, height: u64) -> Result<Block, String> {
         .send()
         .await
         .map_err(|e| format!("RPC request failed: {e}"))?
-        .json()
+        .bytes()
         .await
+        .map_err(|e| format!("Failed to read block response: {e}"))?;
+
+    let block_resp: BlockResponse = serde_json::from_slice(&block_bytes)
         .map_err(|e| format!("Failed to parse block response: {e}"))?;
 
     Ok(block_resp.result)
@@ -128,7 +131,11 @@ async fn main() {
 
     let app = Router::new()
         .route("/{filename}", axum::routing::get(handle_bitmap))
-        .layer(tower_http::trace::TraceLayer::new_for_http())
+        .layer(
+            tower_http::trace::TraceLayer::new_for_http()
+                .make_span_with(tower_http::trace::DefaultMakeSpan::new().level(tracing::Level::INFO))
+                .on_response(tower_http::trace::DefaultOnResponse::new().level(tracing::Level::INFO)),
+        )
         .with_state(state);
 
     let addr = std::net::SocketAddr::from(([0, 0, 0, 0], port));
