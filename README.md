@@ -1,5 +1,7 @@
 # bitmap-renderer
 
+BTC Donations: bc1qpq6600v0kuapsasv99jr24zrjhz83qk0s7fk32
+
 A Rust service that renders Bitcoin block bitmaps as PNG images. Given a block number, it fetches the block's transaction data from a Bitcoin Core RPC node and produces a Mondrian-style visualization where each transaction is represented as an orange square.
 
 This renderer is **block-number native** — it takes a block height and renders it directly from on-chain transaction data. It doesn't know or care about inscription IDs, ordinal theory, or which bitmap is inscribed to which block. If you have a block number, you get an image.
